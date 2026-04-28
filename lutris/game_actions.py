@@ -31,7 +31,6 @@ from lutris.util import xdgshortcuts
 from lutris.util.jobs import AsyncCall
 from lutris.util.log import logger
 from lutris.util.standalone_scripts import generate_script
-from lutris.util.steam import shortcut as steam_shortcut
 from lutris.util.strings import gtk_safe, slugify
 from lutris.util.system import path_exists
 
@@ -278,13 +277,6 @@ class SingleGameActions(GameActions):
             ("rm-desktop-shortcut", _("Delete desktop shortcut"), self.on_remove_desktop_shortcut),
             ("menu-shortcut", _("Create application menu shortcut"), self.on_create_menu_shortcut),
             ("rm-menu-shortcut", _("Delete application menu shortcut"), self.on_remove_menu_shortcut),
-            ("steam-shortcut", _("Create Steam shortcut"), self.on_create_steam_shortcut),
-            (
-                "steam-bigpicture-shortcut",
-                _("Create Steam Big-Picture shortcut"),
-                self.on_create_steam_bigpicture_shortcut,
-            ),
-            ("rm-steam-shortcut", _("Delete Steam shortcut"), self.on_remove_steam_shortcut),
             ("view", _("View on Lutris.net"), self.on_view_game),
             ("view-store", _("View on store page"), self.on_view_store),
             ("duplicate", _("Duplicate"), self.on_game_duplicate),
@@ -296,13 +288,6 @@ class SingleGameActions(GameActions):
         """Return a dictionary of actions that should be shown for a game"""
 
         game = self.game
-        has_steam = steam_shortcut.vdf_file_exists()
-        if has_steam:
-            has_steam_shortcut = steam_shortcut.shortcut_exists(game)
-            is_steam_game = steam_shortcut.is_steam_game(game)
-        else:
-            has_steam_shortcut = False
-            is_steam_game = False
 
         return {
             "duplicate": game.is_installed,
@@ -326,10 +311,6 @@ class SingleGameActions(GameActions):
                 game.is_installed and not xdgshortcuts.desktop_launcher_exists(game.slug, game.id)
             ),
             "menu-shortcut": bool(game.is_installed and not xdgshortcuts.menu_launcher_exists(game.slug, game.id)),
-            "steam-shortcut": bool(has_steam and game.is_installed and not has_steam_shortcut and not is_steam_game),
-            "rm-desktop-shortcut": bool(game.is_installed and xdgshortcuts.desktop_launcher_exists(game.slug, game.id)),
-            "rm-menu-shortcut": bool(game.is_installed and xdgshortcuts.menu_launcher_exists(game.slug, game.id)),
-            "rm-steam-shortcut": bool(game.is_installed and has_steam_shortcut and not is_steam_game),
             "remove": self.is_game_removable,
             "view": True,
             "view-store": bool(game.service and self._get_store_url(game)),
@@ -391,25 +372,6 @@ class SingleGameActions(GameActions):
         if launch_config_name is not None:
             xdgshortcuts.create_launcher(game.slug, game.id, game.name, launch_config_name, menu=True)
 
-    def on_create_steam_shortcut(self, *_args: Any) -> None:
-        """Add the selected game to steam as a nonsteam-game."""
-        game = self.game
-        launch_config_name = self._select_game_launch_config_name(game)
-        if launch_config_name is not None:
-            steam_shortcut.create_shortcut(game, launch_config_name)
-
-    def on_create_steam_bigpicture_shortcut(self, *_args: Any) -> None:
-        """Add the selected game to steam as a nonsteam-game."""
-        game = self.game
-        launch_config_name = self._select_game_launch_config_name(game)
-
-        if launch_config_name is not None:
-            steam_shortcut.create_shortcut(game, launch_config_name, True)
-            db_game = games.get_game_by_field(game.id, "id")
-            if db_game:
-                gamepath = f"{Path.home()!s}/.local/share/applications/lutris-{game.slug}.sh"
-                generate_script(logger, LaunchUIDelegate(), db_game, gamepath)
-
     def on_create_desktop_shortcut(self, *_args: Any) -> None:
         """Create a desktop launcher for the selected game."""
         game = self.game
@@ -421,10 +383,6 @@ class SingleGameActions(GameActions):
         """Remove an XDG menu shortcut"""
         game = self.game
         xdgshortcuts.remove_launcher(game.slug, game.id, menu=True)
-
-    def on_remove_steam_shortcut(self, *_args: Any) -> None:
-        """Remove the selected game from list of non-steam apps."""
-        steam_shortcut.remove_shortcut(self.game)
 
     def on_remove_desktop_shortcut(self, *_args: Any) -> None:
         """Remove a .desktop shortcut"""

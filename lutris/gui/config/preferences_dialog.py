@@ -8,7 +8,6 @@ from textwrap import dedent
 from gi.repository import Gtk
 
 from lutris.config import LutrisConfig
-from lutris.gui.config.accounts_box import AccountsBox
 from lutris.gui.config.boxes import SystemConfigBox
 from lutris.gui.config.game_common import GameDialogCommon
 from lutris.gui.config.preferences_box import InterfacePreferencesBox
@@ -36,7 +35,6 @@ class PreferencesDialog(GameDialogCommon):
         sidebar.add(self.get_sidebar_button("prefs-stack", _("Interface"), "view-grid-symbolic"))
         sidebar.add(self.get_sidebar_button("runners-stack", _("Runners"), "applications-utilities-symbolic"))
         sidebar.add(self.get_sidebar_button("services-stack", _("Sources"), "application-x-addon-symbolic"))
-        sidebar.add(self.get_sidebar_button("accounts-stack", _("Accounts"), "system-users-symbolic"))
         sidebar.add(self.get_sidebar_button("updates-stack", _("Updates"), "system-software-install-symbolic"))
         sidebar.add(self.get_sidebar_button("sysinfo-stack", C_("preferences", "System"), "computer-symbolic"))
         sidebar.add(self.get_sidebar_button("storage-stack", _("Storage"), "drive-harddisk-symbolic"))
@@ -57,10 +55,6 @@ class PreferencesDialog(GameDialogCommon):
         services_box = ServicesBox()
         self.page_generators["services-stack"] = services_box.populate_services
         self.stack.add_named(self.build_scrolled_window(services_box), "services-stack")
-
-        accounts_box = AccountsBox()
-        self.page_generators["accounts-stack"] = accounts_box.populate_steam_accounts
-        self.stack.add_named(self.build_scrolled_window(accounts_box), "accounts-stack")
 
         updates_box = UpdatesBox()
         self.page_generators["updates-stack"] = updates_box.populate
