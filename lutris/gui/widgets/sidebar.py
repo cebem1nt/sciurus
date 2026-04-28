@@ -527,10 +527,12 @@ class LutrisSidebar(Gtk.ListBox):
 
     def _on_section_toggle(self, section_id: str, collapsed: bool) -> None:
         """Handle section collapse/expand toggle."""
+        
         if collapsed:
             self.collapsed_sections.add(section_id)
         else:
             self.collapsed_sections.discard(section_id)
+
         self._save_collapsed_sections()
         self.invalidate_filter()
 

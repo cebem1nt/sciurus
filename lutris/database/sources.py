@@ -23,9 +23,11 @@ def read_sources() -> list[str]:
 
 def write_sources(sources: list[str]) -> None:
     db_sources = read_sources()
+
     for uri in db_sources:
         if uri not in sources:
             sql.db_delete(settings.DB_PATH, "sources", "uri", uri)
+    
     for uri in sources:
         if uri not in db_sources:
             sql.db_insert(settings.DB_PATH, "sources", {"uri": uri})

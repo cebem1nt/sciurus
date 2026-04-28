@@ -4,25 +4,13 @@ import os
 from typing import TYPE_CHECKING
 
 from lutris import settings
-from lutris.services.amazon import AmazonService
-from lutris.services.battlenet import BattleNetService
-from lutris.services.dolphin import DolphinService
-from lutris.services.ea_app import EAAppService
-from lutris.services.egs import EpicGamesStoreService
-from lutris.services.flathub import FlathubService
-from lutris.services.gamejolt import GameJoltService
-from lutris.services.gog import GOGService
-from lutris.services.humblebundle import HumbleBundleService
-from lutris.services.itchio import ItchIoService
-from lutris.services.lutris import LutrisService
-from lutris.services.mame import MAMEService
-from lutris.services.scummvm import SCUMMVM_CONFIG_FILE, ScummvmService
-from lutris.services.steam import SteamService
-from lutris.services.steamfamily import SteamFamilyService
-from lutris.services.steamwindows import SteamWindowsService
-from lutris.services.ubisoft import UbisoftConnectService
+
 from lutris.services.xdg import XDGService
-from lutris.services.zoom import ZoomService
+from lutris.services.dolphin import DolphinService
+from lutris.services.flathub import FlathubService
+from lutris.services.lutris import LutrisService
+from lutris.services.scummvm import SCUMMVM_CONFIG_FILE, ScummvmService
+
 from lutris.util import system
 from lutris.util.dolphin.cache_reader import DOLPHIN_GAME_CACHE_FILE
 from lutris.util.linux import LINUX_SYSTEM
@@ -30,52 +18,30 @@ from lutris.util.linux import LINUX_SYSTEM
 if TYPE_CHECKING:
     from lutris.services.base import BaseService
 
-DEFAULT_SERVICES = ["gog", "egs", "ea_app", "ubisoft", "steam"]
-
+DEFAULT_SERVICES = []
 
 def get_services() -> dict[str, "type[BaseService]"]:
     """Return a mapping of available services"""
-    _services = {
-        "gog": GOGService,
-        "zoomplatform": ZoomService,
-        "humblebundle": HumbleBundleService,
-        "egs": EpicGamesStoreService,
-        "gamejolt": GameJoltService,
-        "itchio": ItchIoService,
-        "ea_app": EAAppService,
-        "ubisoft": UbisoftConnectService,
-        "amazon": AmazonService,
-        "flathub": FlathubService,
-    }
-    _services["battlenet"] = BattleNetService
-    if not LINUX_SYSTEM.is_flatpak():
-        _services["xdg"] = XDGService
-    if LINUX_SYSTEM.has_steam():
-        _services["steam"] = SteamService
-    _services["steamwindows"] = SteamWindowsService
-    _services["steamfamily"] = SteamFamilyService
-    if system.path_exists(DOLPHIN_GAME_CACHE_FILE):
-        _services["dolphin"] = DolphinService
-    if system.path_exists(SCUMMVM_CONFIG_FILE):
-        _services["scummvm"] = ScummvmService
-    if os.environ.get("LUTRIS_SERVICE_ENABLED") == "1":
-        _services["lutris"] = LutrisService
-    return _services
 
+    services = {}
+
+    if not LINUX_SYSTEM.is_flatpak():
+        services["xdg"] = XDGService
+    else:
+        services["flathub"] = FlathubService
+
+    if system.path_exists(DOLPHIN_GAME_CACHE_FILE):
+        services["dolphin"] = DolphinService
+
+    if system.path_exists(SCUMMVM_CONFIG_FILE):
+        services["scummvm"] = ScummvmService
+
+    if os.environ.get("LUTRIS_SERVICE_ENABLED") == "1":
+        services["lutris"] = LutrisService
+    
+    return services
 
 SERVICES = get_services()
-
-
-# Those services are not yet ready to be used
-def get_wip_services() -> dict[str, "type[BaseService]"]:
-    return {"mame": MAMEService}
-
-
-WIP_SERVICES = get_wip_services()
-
-if os.environ.get("LUTRIS_ENABLE_ALL_SERVICES"):
-    SERVICES.update(WIP_SERVICES)
-
 
 def get_enabled_services():
     return {

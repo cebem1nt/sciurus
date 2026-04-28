@@ -161,13 +161,16 @@ def run_all_checks(async_ops: bool = True) -> None:
 def init_lutris():
     """Run full initialization of Lutris"""
     runners.inject_runners(load_json_runners())
+
     init_dirs()
+    
     try:
         syncdb()
     except sqlite3.DatabaseError as err:
         raise RuntimeError(
             _("Failed to open database file in %s. Try renaming this file and relaunch Lutris") % settings.DB_PATH
         ) from err
+
     for service in DEFAULT_SERVICES:
         if not settings.read_setting(service, section="services"):
             settings.write_setting(service, True, section="services")
