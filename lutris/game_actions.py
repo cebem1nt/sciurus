@@ -255,33 +255,31 @@ class SingleGameActions(GameActions):
 
     def get_game_actions(self) -> list[tuple[str | None, str, Callable[..., None] | None]]:
         return [
-            ("play", _("Play"), self.on_game_launch),
-            ("stop", _("Stop"), self.on_game_stop),
-            ("execute-script", _("Execute script"), self.on_execute_script_clicked),
-            ("show_logs", _("Show logs"), self.on_show_logs),
+            ("play",                _("Play"), self.on_game_launch),
+            ("stop",                _("Stop"), self.on_game_stop),
+            ("execute-script",      _("Execute script"), self.on_execute_script_clicked),
+            ("show_logs",           _("Show logs"), self.on_show_logs),
             (None, "-", None),
-            ("configure", _("Configure"), self.on_edit_game_configuration),
-            ("category", _("Categories"), self.on_edit_game_categories),
-            ("browse", _("Browse files"), self.on_browse_files),
-            ("favorite", _("Add to favorites"), self.on_add_favorite_game),
-            ("deletefavorite", _("Remove from favorites"), self.on_delete_favorite_game),
-            ("hide", _("Hide game from library"), self.on_hide_game),
-            ("unhide", _("Unhide game from library"), self.on_unhide_game),
+            ("configure",           _("Configure"), self.on_edit_game_configuration),
+            ("category",            _("Categories"), self.on_edit_game_categories),
+            ("browse",              _("Browse files"), self.on_browse_files),
+            ("favorite",            _("Add to favorites"), self.on_add_favorite_game),
+            ("deletefavorite",      _("Remove from favorites"), self.on_delete_favorite_game),
+            ("hide",                _("Hide game from library"), self.on_hide_game),
+            ("unhide",              _("Unhide game from library"), self.on_unhide_game),
             (None, "-", None),
-            ("install", _("Install"), self.on_install_clicked),
-            ("install_more", _("Install another version"), self.on_install_clicked),
-            ("install_dlcs", _("Install DLCs"), self.on_install_dlc_clicked),
-            ("update", _("Install updates"), self.on_update_clicked),
-            ("add", _("Locate installed game"), self.on_locate_installed_game),
-            ("desktop-shortcut", _("Create desktop shortcut"), self.on_create_desktop_shortcut),
+            ("install",             _("Install"), self.on_install_clicked),
+            ("install_dlcs",        _("Install DLCs"), self.on_install_dlc_clicked),
+            ("update",              _("Install updates"), self.on_update_clicked),
+            ("add",                 _("Locate installed game"), self.on_locate_installed_game),
+            ("desktop-shortcut",    _("Create desktop shortcut"), self.on_create_desktop_shortcut),
             ("rm-desktop-shortcut", _("Delete desktop shortcut"), self.on_remove_desktop_shortcut),
-            ("menu-shortcut", _("Create application menu shortcut"), self.on_create_menu_shortcut),
-            ("rm-menu-shortcut", _("Delete application menu shortcut"), self.on_remove_menu_shortcut),
-            ("view", _("View on Lutris.net"), self.on_view_game),
-            ("view-store", _("View on store page"), self.on_view_store),
-            ("duplicate", _("Duplicate"), self.on_game_duplicate),
+            ("menu-shortcut",       _("Create application menu shortcut"), self.on_create_menu_shortcut),
+            ("rm-menu-shortcut",    _("Delete application menu shortcut"), self.on_remove_menu_shortcut),
+            ("view",                _("View on Lutris.net"), self.on_view_game),
+            ("duplicate",           _("Duplicate"), self.on_game_duplicate),
             (None, "-", None),
-            ("remove", _("Remove"), self.on_remove_game),
+            ("remove",              _("Remove"), self.on_remove_game),
         ]
 
     def get_displayed_entries(self) -> dict[str, bool]:
@@ -297,23 +295,17 @@ class SingleGameActions(GameActions):
             "update": game.is_updatable,
             "install_dlcs": game.is_updatable,
             "stop": self.is_game_running,
-            "configure": bool(game.is_installed),
+            "configure": game.is_installed,
             "browse": game.is_installed and game.runner_name != "browser",
             "show_logs": game.is_installed,
-            "category": True,
             "favorite": not game.is_favorite,
             "deletefavorite": game.is_favorite,
-            "install_more": not game.service and game.is_installed,
-            "execute-script": bool(
-                game.is_installed and game.has_runner and game.runner.system_config.get("manual_command")
-            ),
-            "desktop-shortcut": bool(
-                game.is_installed and not xdgshortcuts.desktop_launcher_exists(game.slug, game.id)
-            ),
-            "menu-shortcut": bool(game.is_installed and not xdgshortcuts.menu_launcher_exists(game.slug, game.id)),
+            "execute-script": bool(game.is_installed and game.has_runner and game.runner.system_config.get("manual_command")),
+            "desktop-shortcut": game.is_installed and not xdgshortcuts.desktop_launcher_exists(game.slug, game.id),
+            "rm-desktop-shortcut": game.is_installed and xdgshortcuts.desktop_launcher_exists(game.slug, game.id),
+            "menu-shortcut": game.is_installed and not xdgshortcuts.menu_launcher_exists(game.slug, game.id),
+            "rm-menu-shortcut": game.is_installed and xdgshortcuts.menu_launcher_exists(game.slug, game.id),
             "remove": self.is_game_removable,
-            "view": True,
-            "view-store": bool(game.service and self._get_store_url(game)),
             "hide": game.is_installed and not game.is_hidden,
             "unhide": game.is_hidden,
         }
@@ -329,6 +321,7 @@ class SingleGameActions(GameActions):
         """Execute the game's associated script"""
         game = self.game
         manual_command: str = game.runner.system_config.get("manual_command")
+        
         if path_exists(manual_command):
             runner = game.runner
             env = runner.get_env()

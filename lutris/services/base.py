@@ -23,7 +23,6 @@ from lutris.gui.widgets.utils import BANNER_SIZE, ICON_SIZE
 from lutris.services.service_media import ServiceMedia
 from lutris.util import system
 from lutris.util.busy import BusyAsyncCall
-from lutris.util.cookies import WebkitCookieJar
 from lutris.util.jobs import AsyncCall
 from lutris.util.log import logger
 from lutris.util.strings import slugify
@@ -530,12 +529,3 @@ class OnlineService(BaseService):
                 logger.warning("Unable to remove %s", auth_file)
         logger.debug("logged out from %s", self.id)
         SERVICE_LOGOUT.fire(self)
-
-    def load_cookies(self):
-        """Load cookies from disk"""
-        if not system.path_exists(self.cookies_path):
-            logger.warning("No cookies found in %s, please authenticate first", self.cookies_path)
-            return
-        cookiejar = WebkitCookieJar(self.cookies_path)
-        cookiejar.load()
-        return cookiejar

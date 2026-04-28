@@ -114,10 +114,7 @@ class LutrisApplication(Gtk.Application):
         except GLib.Error as e:
             logger.exception(e)
 
-        if hasattr(self, "add_main_option"):
-            self.add_arguments()
-        else:
-            ErrorDialog(_("Your Linux distribution is too old. Lutris won't function properly."))
+        self.add_arguments()
 
     def add_arguments(self) -> None:
         if hasattr(self, "set_option_context_summary"):

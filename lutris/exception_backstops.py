@@ -97,7 +97,8 @@ def _create_error_wrapper(
 
 
 def init_exception_backstops() -> None:
-    """This function is called once only, during startup, and replaces ("swizzles") a bunch of
+    """
+    This function is called once only, during startup, and replaces ("swizzles") a bunch of
     callback setup functions in GLib. The callbacks are all wrapped with error handlers that
     log the error and report it.
 
