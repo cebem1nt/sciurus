@@ -21,7 +21,7 @@ from lutris.exceptions import (
     UnspecifiedVersionError,
 )
 from lutris.game import Game
-from lutris.gui.dialogs import FileDialog
+from lutris.gui.dialogs import FileDialog, QuestionDialog
 from lutris.runners.commands.wine import (  # noqa: F401 pylint: disable=unused-import
     create_prefix,
     delete_registry_key,
@@ -682,6 +682,7 @@ class wine(Runner):
     def context_menu_entries(self):
         """Return the contexual menu entries for wine"""
         return [
+            ("killwine", _("Kill all Wine processes"), self.kill_wine),
             ("wineexec", _("Run EXE inside Wine prefix"), self.run_wineexec),
             ("wineshell", _("Open Bash terminal"), self.run_wine_terminal),
             ("wineconsole", _("Open Wine console"), self.run_wineconsole),
@@ -692,7 +693,25 @@ class wine(Runner):
             ("winetaskmgr", _("Wine Task Manager"), self.run_taskmgr),
             (None, "-", None),
             ("winetricks", _("Winetricks"), self.run_winetricks),
+            # "kill-wine": Action(self.on_kill_wine),
         ]
+
+    def kill_wine(self, *_args):
+        """Callback to kill all Wine processes after confirmation."""
+        dlg = QuestionDialog(
+            {
+                "title": _("Kill all Wine processes"),
+                "question": _(
+                    "This will kill <b>all</b> Wine processes on the system, "
+                    "including any not launched by Lutris.\n\n"
+                    "Are you sure you want to continue?"
+                ),
+            }
+        )
+        if dlg.result == dlg.YES:
+            from lutris.util.wine.wine import kill_all_wine_processes  # noqa: PLC0415
+
+            kill_all_wine_processes()
 
     @property
     def prefix_path(self):

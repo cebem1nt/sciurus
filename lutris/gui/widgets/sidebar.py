@@ -54,7 +54,8 @@ class SidebarRow(Gtk.ListBoxRow):
     SPACING = 6
 
     def __init__(self, id_, type_, name, icon, application=None):
-        """Initialize the row
+        """
+        Initialize the row
 
         Parameters:
             id_: identifier of the row
