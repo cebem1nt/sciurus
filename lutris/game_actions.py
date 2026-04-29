@@ -218,15 +218,15 @@ class MultiGameActions(GameActions):
 
     def get_game_actions(self) -> list[tuple[str | None, str, Callable[..., None] | None]]:
         return [
-            ("stop", _("Stop"), self.on_game_stop),
+            ("stop",            _("Stop"), self.on_game_stop),
             (None, "-", None),
-            ("category", _("Categories"), self.on_edit_game_categories),
-            ("favorite", _("Add to favorites"), self.on_add_favorite_game),
-            ("deletefavorite", _("Remove from favorites"), self.on_delete_favorite_game),
-            ("hide", _("Hide game from library"), self.on_hide_game),
-            ("unhide", _("Unhide game from library"), self.on_unhide_game),
+            ("category",        _("Categories"), self.on_edit_game_categories),
+            ("favorite",        _("Add to favorites"), self.on_add_favorite_game),
+            ("deletefavorite",  _("Remove from favorites"), self.on_delete_favorite_game),
+            ("hide",            _("Hide game from library"), self.on_hide_game),
+            ("unhide",          _("Unhide game from library"), self.on_unhide_game),
             (None, "-", None),
-            ("remove", _("Remove"), self.on_remove_game),
+            ("remove",          _("Remove"), self.on_remove_game),
         ]
 
     def get_displayed_entries(self) -> dict[str, bool]:

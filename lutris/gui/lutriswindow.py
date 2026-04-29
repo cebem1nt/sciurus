@@ -111,6 +111,7 @@ class LutrisWindow(Gtk.ApplicationWindow, DialogLaunchUIDelegate, DialogInstallU
     def __init__(self, application=None, **kwargs) -> None:
         width = int(settings.read_setting("width") or self.default_width)
         height = int(settings.read_setting("height") or self.default_height)
+
         super().__init__(
             default_width=width,
             default_height=height,
@@ -120,6 +121,7 @@ class LutrisWindow(Gtk.ApplicationWindow, DialogLaunchUIDelegate, DialogInstallU
             application=application,
             **kwargs,
         )
+
         update_desktop_icons()
         load_icon_theme()
         self.set_wmclass("net.lutris.Lutris", "net.lutris.Lutris")

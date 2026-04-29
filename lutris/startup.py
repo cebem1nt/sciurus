@@ -170,7 +170,3 @@ def init_lutris():
         raise RuntimeError(
             _("Failed to open database file in %s. Try renaming this file and relaunch Lutris") % settings.DB_PATH
         ) from err
-
-    for service in DEFAULT_SERVICES:
-        if not settings.read_setting(service, section="services"):
-            settings.write_setting(service, True, section="services")
