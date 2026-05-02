@@ -101,11 +101,11 @@ def _get_version_warning(_option_key: str, config: LutrisConfig) -> str | None:
 
 
 def _get_prefix_warning(_option_key: str, config: LutrisConfig) -> str | None:
-    game_config = config.game_config
-    if game_config.get("prefix"):
+    runner_config = config.runner_config
+    if runner_config.get("prefix"):
         return None
 
-    exe = game_config.get("exe")
+    exe = runner_config.get("exe")
     if exe and find_prefix(exe):
         return None
 
