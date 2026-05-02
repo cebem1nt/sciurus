@@ -14,7 +14,7 @@ from lutris.installer import get_entry_point_path
 from lutris.installer.commands import CommandsMixin
 from lutris.installer.errors import MissingGameDependencyError, ScriptingError
 from lutris.installer.installer import LutrisInstaller
-from lutris.runners import NonInstallableRunnerError, RunnerInstallationError, steam, wine
+from lutris.runners import NonInstallableRunnerError, RunnerInstallationError, wine
 from lutris.services.lutris import download_lutris_media
 from lutris.util import system
 from lutris.util.display import DISPLAY_MANAGER
@@ -473,7 +473,6 @@ class ScriptInterpreter(GObject.Object, CommandsMixin):
             "SCRIPTDIR": self.installer.scriptdir,
             "CACHE": self.cache_path,
             "HOME": os.path.expanduser("~"),
-            "STEAM_DATA_DIR": steam.steam().steam_data_dir,
             "DISC": self.game_disc,
             "USER": os.getenv("USER"),
             "INPUT": self.user_inputs[-1]["value"] if self.user_inputs else "",

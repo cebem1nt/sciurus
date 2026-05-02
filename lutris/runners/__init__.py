@@ -28,7 +28,6 @@ __all__ = [
     "scummvm",
     "shadps4",
     "snes9x",
-    "steam",
     "vice",
     "vita3k",
     "web",

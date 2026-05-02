@@ -64,11 +64,11 @@ except ImportError:
 if "WEBKIT_DISABLE_DMABUF_RENDERER" not in os.environ:
     os.environ["WEBKIT_DISABLE_DMABUF_RENDERER"] = "1"
 
-try:
-    from lutris.gui.application import LutrisApplication
-except ImportError as ex:
-    sys.stderr.write("Error importing Lutris application module: %s\n" % ex)
-    sys.exit(1)
+# try:
+from lutris.gui.application import LutrisApplication
+# except ImportError as ex:
+#     sys.stderr.write("Error importing Lutris application module: %s\n" % ex)
+#     sys.exit(1)
 
 app = LutrisApplication()
 sys.exit(app.run(sys.argv))

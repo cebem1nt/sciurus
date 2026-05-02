@@ -8,7 +8,6 @@ from gi.repository import GObject, Gtk
 from lutris.gui.installer.widgets import InstallerLabel
 from lutris.gui.widgets.common import FileChooserEntry
 from lutris.installer.installer_file_collection import InstallerFileCollection
-from lutris.installer.steam_installer import SteamInstaller
 from lutris.util import system
 from lutris.util.log import logger
 from lutris.util.strings import gtk_safe
@@ -70,23 +69,7 @@ class InstallerFileBox(Gtk.VBox):
             box.pack_start(user_label, False, False, 0)
             return box
         # InstallerFileCollection should not have steam provider
-        if self.provider == "steam":
-            if isinstance(self.installer_file, InstallerFileCollection):
-                raise RuntimeError("Installer file is type InstallerFileCollection and do not support 'steam' provider")
-            steam_installer = SteamInstaller(self.installer_file.url, self.installer_file.id)
-            steam_installer.game_installed.register(self.on_steam_game_installed)
-            steam_installer.game_state_changed.register(self.on_steam_game_state_changed)
-            self.start_func = steam_installer.install_steam_game
-            self.stop_func = steam_installer.stop_func
-
-            steam_box = Gtk.HBox(spacing=6)
-            info_box = Gtk.VBox(spacing=6)
-            steam_label = InstallerLabel(_("Steam game <b>{appid}</b>").format(appid=steam_installer.appid))
-            info_box.add(steam_label)
-            self.state_label = InstallerLabel("")
-            info_box.add(self.state_label)
-            steam_box.add(info_box)
-            return steam_box
+       
         raise ValueError("Invalid provider %s" % self.provider)
 
     def get_combobox_model(self):
