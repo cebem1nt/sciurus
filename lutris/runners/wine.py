@@ -93,7 +93,7 @@ def _is_proton_hdr_available(_option_key: str, config: LutrisConfig) -> bool:
 
 
 def _get_version_warning(_option_key: str, config: LutrisConfig) -> str | None:
-    arch = config.game_config.get("arch")
+    arch = config.runner_config.get("arch")
     if arch == "win32" and _is_proton_config(config):
         return _("Proton is not compatible with 32-bit prefixes.")
 
@@ -301,26 +301,6 @@ class wine(Runner):
             ),
         },
         {
-            "option": "prefix",
-            "type": "directory",
-            "label": _("Wine prefix"),
-            "warning": _get_prefix_warning,
-            "help": _(
-                "The prefix used by Wine.\n"
-                "It's a directory containing a set of files and "
-                "folders making up a confined Windows environment."
-            ),
-        },
-        {
-            "option": "arch",
-            "type": "choice",
-            "label": _("Prefix architecture"),
-            "visible": _is_pre_proton,
-            "choices": [(_("Auto"), "auto"), (_("32-bit"), "win32"), (_("64-bit"), "win64")],
-            "default": "auto",
-            "help": _("The architecture of the Windows environment"),
-        },
-        {
             "option": "desktop_integration",
             "type": "bool",
             "label": _("Integrate system files in the prefix"),
@@ -353,6 +333,26 @@ class wine(Runner):
             "type": "file",
             "advanced": True,
             "help": _('The Wine executable to be used if you have selected "Custom" as the Wine version.'),
+        },
+        {
+            "option": "prefix",
+            "type": "directory",
+            "label": _("Wine prefix"),
+            "warning": _get_prefix_warning,
+            "help": _(
+                "The prefix used by Wine.\n"
+                "It's a directory containing a set of files and "
+                "folders making up a confined Windows environment."
+            ),
+        },
+        {
+            "option": "arch",
+            "type": "choice",
+            "label": _("Prefix architecture"),
+            "visible": _is_pre_proton,
+            "choices": [(_("Auto"), "auto"), (_("32-bit"), "win32"), (_("64-bit"), "win64")],
+            "default": "auto",
+            "help": _("The architecture of the Windows environment"),
         },
         {
             "option": "system_winetricks",
@@ -711,7 +711,7 @@ class wine(Runner):
     @property
     def prefix_path(self):
         """Return the absolute path of the Wine prefix. Falls back to default WINE prefix."""
-        _prefix_path = self._prefix or self.game_config.get("prefix") or os.environ.get("WINEPREFIX")
+        _prefix_path = self._prefix or self.runner_config.get("prefix") or os.environ.get("WINEPREFIX")
         if not _prefix_path and self.game_config.get("exe"):
             # Find prefix from game if we have one
             _prefix_path = find_prefix(self.game_exe)
@@ -764,7 +764,7 @@ class wine(Runner):
         """Return the wine architecture.
 
         Get it from the config or detect it from the prefix"""
-        arch = self._wine_arch or self.game_config.get("arch") or "auto"
+        arch = self._wine_arch or self.runner_config.get("arch") or "auto"
         if arch not in ("win32", "win64"):
             prefix_path = self.prefix_path
             if prefix_path:

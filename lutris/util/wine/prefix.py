@@ -33,10 +33,13 @@ def is_prefix(path):
 def find_prefix(path):
     """Given an executable path, try to find a Wine prefix associated with it."""
     dir_path = path
+
     if not dir_path:
         logger.info("No path given, unable to guess prefix location")
         return
+
     dir_path = os.path.expanduser(dir_path)
+    
     while dir_path != "/" and dir_path:
         dir_path = os.path.dirname(dir_path)
         if is_prefix(dir_path):
