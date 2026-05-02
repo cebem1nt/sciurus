@@ -67,6 +67,7 @@ from lutris.util.wine.wine import (
     is_fsync_supported,
     is_gstreamer_build,
     is_winewayland_available,
+    kill_all_wine_processes
 )
 
 if TYPE_CHECKING:
@@ -256,6 +257,18 @@ def _get_wine_version_choices():
         version_choices.append((label, version))
     return version_choices
 
+
+def _get_kill_wine_dialog():
+    return QuestionDialog(
+        {
+            "title": _("Kill all Wine processes"),
+            "question": _(
+                "This will kill <b>all</b> Wine processes on the system, "
+                "including any not launched by Lutris.\n\n"
+                "Are you sure you want to continue?"
+            ),
+        }
+    )
 
 class wine(Runner):
     description: str = _("Runs Windows games")
@@ -682,7 +695,7 @@ class wine(Runner):
     def context_menu_entries(self):
         """Return the contexual menu entries for wine"""
         return [
-            ("killwine", _("Kill all Wine processes"), self.kill_wine),
+            ("killwine", _("Kill all Wine processes"), self.kill_all_wine),
             ("wineexec", _("Run EXE inside Wine prefix"), self.run_wineexec),
             ("wineshell", _("Open Bash terminal"), self.run_wine_terminal),
             ("wineconsole", _("Open Wine console"), self.run_wineconsole),
@@ -693,25 +706,7 @@ class wine(Runner):
             ("winetaskmgr", _("Wine Task Manager"), self.run_taskmgr),
             (None, "-", None),
             ("winetricks", _("Winetricks"), self.run_winetricks),
-            # "kill-wine": Action(self.on_kill_wine),
         ]
-
-    def kill_wine(self, *_args):
-        """Callback to kill all Wine processes after confirmation."""
-        dlg = QuestionDialog(
-            {
-                "title": _("Kill all Wine processes"),
-                "question": _(
-                    "This will kill <b>all</b> Wine processes on the system, "
-                    "including any not launched by Lutris.\n\n"
-                    "Are you sure you want to continue?"
-                ),
-            }
-        )
-        if dlg.result == dlg.YES:
-            from lutris.util.wine.wine import kill_all_wine_processes  # noqa: PLC0415
-
-            kill_all_wine_processes()
 
     @property
     def prefix_path(self):
@@ -783,6 +778,14 @@ class wine(Runner):
             return {"version": version}
 
         return super().get_runner_version(version)
+
+    def kill_all_wine(self, *args):
+        """Callback to kill all Wine processes after confirmation."""
+        dlg = _get_kill_wine_dialog()
+
+        if dlg.result == dlg.YES:
+            kill_all_wine_processes()
+
 
     def read_version_from_config(self, default: str | None = None) -> str:
         """Return the Wine version to use. use_default can be set to false to
